@@ -1,22 +1,12 @@
-from flask import Flask, render_template, request, session, flash, redirect, url_for
+from flask import Flask, render_template, request, session, flash, redirect, url_for, abort
+from posts import posts
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pudim'
 
-posts = [
-    {
-        "titulo": "Minha primeira postagem",
-        "texto": "teste"
-    },
-    {
-        "titulo": "Segunda postagem",
-        "texto": "Outro teste"
-    }
-]
-
 @app.route('/')
 def exibir_entradas():
-    entradas = posts  # Mock das entradas
+    entradas = posts[::-1]  # Mock das entradas
     return render_template('exibir_entradas.html', entradas=entradas)
 
 @app.route('/login', methods=["GET", "POST"])
@@ -40,10 +30,18 @@ def logout():
 def inserir_entradas():
     if session['logado']:
         novo_post = {
-            "titulo": request.form['titulo']
+            "titulo": request.form['titulo'],
             "texto": request.form['texto']
         }
         posts.append(novo_post)
         flash("Post criado com sucesso")
     return redirect(url_for('exibir_entradas'))
+
+@app.route('/posts/<int:id>')
+def exibir_entrada(id):
+    try:
+        entrada = posts[id -1]
+        return render_template('exibir_entrada.html', entrada = entrada)
+    except Exception:
+        return abort(404)
 
