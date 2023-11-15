@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session, flash, redirect, url_for
 
-app = Flask("Meu App")
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'pudim'
 
 posts = [
     {
@@ -25,6 +26,24 @@ def login():
         if request.form['username'] == "admin" and request.form['password'] == "admin":
             session['logado'] = True
             flash("Login efetuado com sucesso!")
-            return redirect(url_for('exibir_entradas.html'))
+            return redirect(url_for('exibir_entradas'))
         erro = "Usuario e Senha Invalidos"
     return render_template('login.html', erro=erro)
+
+@app.route('/logout')
+def logout():
+    session.pop('logado')
+    flash("Logout efetuado com sucesso")
+    return redirect(url_for('exibir_entradas'))
+
+@app.route('/inserir', methods = ['POST'])
+def inserir_entradas():
+    if session['logado']:
+        novo_post = {
+            "titulo": request.form['titulo']
+            "texto": request.form['texto']
+        }
+        posts.append(novo_post)
+        flash("Post criado com sucesso")
+    return redirect(url_for('exibir_entradas'))
+

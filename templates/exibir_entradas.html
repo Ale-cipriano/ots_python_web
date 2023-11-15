@@ -2,7 +2,7 @@
 
 {% block corpo %}
   {% if session.logado %}
-    <form action=" " method="post"
+    <form action="{{ url_for( 'inserir_entradas' ) }} " method="post"
           class="ins-entrada">
       <dl>
         <dt>Título:
